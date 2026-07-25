@@ -18,6 +18,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_3_f25_project/data/homophones.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:team_3_f25_project/utils/speech_timeout.dart';
 
 final db = DatabaseHelper.instance;
 
@@ -60,11 +61,12 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
   String recordingPath = "";
   bool _speechEnabled = false;
   bool _isListening = false;
+  bool _hasSpeechResult = false;
 
   // timer variables
   Duration _elapsed = Duration.zero;
   Timer? _timer;
-  static const Duration kMax = Duration(seconds: 3);
+  static const Duration kMax = Duration(seconds: 10);
 
   @override
   void initState() {
@@ -209,6 +211,8 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
       }
     }
 
+    _hasSpeechResult = false;
+
     // start speech to text engine
     await _speechToText.listen(
       onResult: _onSpeechResult,
@@ -235,12 +239,14 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(milliseconds: 200), (t) {
       final next = _elapsed + const Duration(milliseconds: 200);
-      if (next > kMax && _isListening) {
+      if (_isListening && !_hasSpeechResult && shouldStopListening(next, kMax)) {
         _stopListening();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TimeOutScreen()),
-        );
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TimeOutScreen()),
+          );
+        }
       } else {
         setState(() {
           _elapsed = next;
@@ -254,6 +260,7 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
     setState(() {
       _timer?.cancel();
       _isListening = false;
+      _hasSpeechResult = false;
     });
     await _speechToText.stop();
     await _recorder.stop();
@@ -273,6 +280,8 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
   void _onSpeechResult(SpeechRecognitionResult? result) {
     // only process final result, not intermediate ones
     if (result!.finalResult) {
+      _hasSpeechResult = true;
+
       // stop listening and check if correct
       _stopListening();
       bool correct = _isCorrect(result.recognizedWords);

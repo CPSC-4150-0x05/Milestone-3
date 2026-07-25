@@ -5,6 +5,7 @@ import 'package:team_3_f25_project/models/attempt.dart';
 import 'package:team_3_f25_project/services/sync_service.dart';
 import '../models/user.dart';
 import 'list_service.dart';
+import '../utils/list_assignment.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -155,7 +156,7 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<int?> getUserListId(int uid) async {
+  Future<int> getUserListId(int uid) async {
     print("Getting list id for user $uid");
     final db = await instance.database;
     final result = await db.query(
@@ -164,12 +165,22 @@ class DatabaseHelper {
       where: 'uid = ?',
       whereArgs: [uid],
     );
+
     if (result.isNotEmpty) {
       final listId = result[0]['currentListId'];
-      print("List ID: $listId");
-      return listId as int;
+      final existingListId = listId is int ? listId : null;
+      print("List ID: $existingListId");
+      return resolveAssignedListId(existingListId, await WordService.getTopPriority());
     }
-    return null;
+
+    final fallbackListId = await WordService.getTopPriority();
+    final insertedId = await addUserListId(uid, fallbackListId);
+
+    if (insertedId <= 0) {
+      throw Exception('Could not assign a word list to this student.');
+    }
+
+    return fallbackListId;
   }
 
   //Clear all rows in user
