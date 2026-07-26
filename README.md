@@ -178,7 +178,7 @@ lib/
 ## Team Members
 
 - Anthony Frialde
-- Price
+- Medelin Price
 - Team 0x05
 
 ---
@@ -201,5 +201,8 @@ lib/
 <img width="250" height="540" alt="Simulator Screenshot - iPhone 15 Pro - 2025-12-09 at 10 53 00" src="https://github.com/user-attachments/assets/2b874e79-32d0-433c-bcea-e1ed230a4919" />
 <img width="250" height="540" alt="Simulator Screenshot - iPhone 15 Pro - 2025-12-09 at 10 33 57" src="https://github.com/user-attachments/assets/113f3ced-f7f2-4e58-bf78-ee26b31adc17" />
 <img width="250" height="540" alt="Simulator Screenshot - iPhone 15 Pro - 2025-12-09 at 10 33 28" src="https://github.com/user-attachments/assets/e58e1765-dc1e-4e2a-9010-cae0c943508f" />
+![Student Dashboard](assets/screenshots/student2.PNG)
+![AI Story Builder](assets/screenshots/storybuilder.PNG)
+![Flash Dash](assets/screenshots/flashdash.PNG)
 
 This project was developed as part of Clemson University's CPSC 4150 Capstone Project.
