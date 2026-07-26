@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:team_3_f25_project/flash_dash/screens/home_screen.dart';
 import 'package:team_3_f25_project/screens/signup.dart';
-import 'package:team_3_f25_project/screens/story_builder.dart';
+import 'package:team_3_f25_project/screens/teacher_story_builder.dart';
 import 'package:team_3_f25_project/screens/wordlist_management.dart';
 import 'package:team_3_f25_project/services/list_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -306,7 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const StoryBuilderScreen(),
+                        builder: (_) => const TeacherStoryBuilderScreen(),
                       ),
                     );
                   },
