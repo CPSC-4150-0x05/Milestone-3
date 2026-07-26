@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_3_f25_project/data/homophones.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:team_3_f25_project/utils/speech_timeout.dart';
+import 'package:flutter/foundation.dart';
 
 final db = DatabaseHelper.instance;
 
@@ -76,37 +77,26 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
   }
 
   // microphone permissions
-  Future<bool> _requestMicrophonePermission() async {
-    if (Platform.isIOS) {
-      return true;
-    }
-
-    // Android: use permission_handler
-    var status = await Permission.microphone.status;
-
-    if (status.isGranted) {
-      return true;
-    }
-
-    if (status.isDenied) {
-      status = await Permission.microphone.request();
-      if (status.isGranted) {
-        setState(() {});
-        return true;
-      }
-    }
-
-    if (status.isPermanentlyDenied) {
-      if (mounted) {}
-      return false;
-    }
-
-    if (status.isRestricted) {
-      return false;
-    }
-
-    return false;
+Future<bool> _requestMicrophonePermission() async {
+  if (kIsWeb) {
+    return true;
   }
+
+  if (Platform.isIOS) {
+    return true;
+  }
+
+  var status = await Permission.microphone.status;
+
+  if (status.isGranted) return true;
+
+  if (status.isDenied) {
+    status = await Permission.microphone.request();
+    return status.isGranted;
+  }
+
+  return false;
+}
 
   // populate variables for tracking progress
   Future<void> _loadUserAndWords() async {
@@ -195,8 +185,11 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
   }
 
   void _startListening() async {
+    if (_isListening) return;
+
+    await _speechToText.stop();
     // mic permissions
-    if (Platform.isIOS) {
+    if (kIsWeb || Platform.isIOS) {
       if (!_speechEnabled) {
         _speechEnabled = await _speechToText.initialize();
         if (!_speechEnabled) {
@@ -213,6 +206,11 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
 
     _hasSpeechResult = false;
 
+        setState(() {
+      _isListening = true;
+      _elapsed = Duration.zero;
+    });
+
     // start speech to text engine
     await _speechToText.listen(
       onResult: _onSpeechResult,
@@ -222,18 +220,16 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
     );
 
     // start recording
-    final config = RecordConfig(
-      encoder: AudioEncoder.aacLc, // -> .m4a
-      sampleRate: 44100,
-      bitRate: 128000,
-    );
-    recordingPath = await _nextPath();
-    await _recorder.start(config, path: recordingPath);
+if (!kIsWeb) {
+  final config = RecordConfig(
+    encoder: AudioEncoder.aacLc,
+    sampleRate: 44100,
+    bitRate: 128000,
+  );
 
-    setState(() {
-      _isListening = true;
-      _elapsed = Duration.zero;
-    });
+  recordingPath = await _nextPath();
+  await _recorder.start(config, path: recordingPath);
+}
 
     // keep track of time and push timeout screen if needed
     _timer?.cancel();
@@ -263,7 +259,9 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
       _hasSpeechResult = false;
     });
     await _speechToText.stop();
+    if (!kIsWeb) {
     await _recorder.stop();
+   }
   }
 
   bool _isCorrect(String recognizedWord) {
@@ -333,7 +331,11 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
   }
 
   Future<String> _nextPath() async {
-    // make path for saving audio (local on device only)
+    if (kIsWeb) {
+      // Web doesn't have a local documents directory.
+      return 'web_recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    }
+
     final dir = await getApplicationDocumentsDirectory();
     final ts = DateTime.now().millisecondsSinceEpoch;
     return '${dir.path}/readright_$currentWord$ts.m4a';

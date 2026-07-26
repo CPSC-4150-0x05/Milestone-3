@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_3_f25_project/models/user.dart';
 import 'package:team_3_f25_project/models/wordlist.dart';
 import 'package:team_3_f25_project/widgets/custom_app_bar.dart';
+import 'package:team_3_f25_project/flash_dash/screens/home_screen.dart';
 import '../services/user_db.dart';
 import '../services/list_service.dart';
 
@@ -65,12 +66,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade50,
       appBar: customAppBar(context: context),
-      body: GestureDetector(
-        onTap: () => Navigator.pushNamed(context, '/practice').then((_) {
-          setState(() {
-            _loadProgress();
-          });
-        }),
+      body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -99,7 +95,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   children: [
                     CircularProgressIndicator(
                       value: completion,
-                      strokeWidth: 100,
+                      strokeWidth: 18,
                       color: Colors.green,
                       backgroundColor: Colors.grey.shade300,
                     ),
@@ -122,7 +118,88 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 30),
+const SizedBox(height: 20),
+
+const Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    "Learning Activities",
+    style: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+
+const SizedBox(height: 10),
+
+Card(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(14),
+  ),
+  child: ListTile(
+    leading: const Icon(Icons.mic, color: Colors.orange),
+    title: const Text("Practice"),
+    subtitle: const Text("Practice your assigned words."),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () {
+      Navigator.pushNamed(context, '/practice').then((_) {
+        _loadProgress();
+      });
+    },
+  ),
+),
+
+Card(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(14),
+  ),
+  child: ListTile(
+    leading: const Icon(Icons.auto_stories, color: Colors.indigo),
+    title: const Text("AI Story Builder"),
+    subtitle: const Text("Generate a personalized reading story."),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () {
+      Navigator.pushNamed(context, '/story-builder');
+    },
+  ),
+),
+
+Card(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(14),
+  ),
+  child: ListTile(
+    leading: const Icon(Icons.flash_on, color: Colors.orange),
+    title: const Text("Flash Dash"),
+    subtitle: const Text("Practice Dolch sight words with a fun game."),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          settings: const RouteSettings(name: 'flash_home'),
+          builder: (_) => const HomeScreen(),
+        ),
+      );
+    },
+  ),
+),
+
+const SizedBox(height: 20),
+
+const Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    "Word List",
+    style: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+
+const SizedBox(height: 10),
 
               Expanded(
                 child: ListView.builder(
@@ -167,47 +244,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ],
           ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(context, '/practice').then((_) {
-                setState(() {
-                  _loadProgress();
-                });
-              });
-            },
-            icon: const Icon(Icons.mic),
-            label: const Text('Practice'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(context, '/story-builder');
-            },
-            icon: const Icon(Icons.auto_stories),
-            label: const Text('AI Story Builder'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
