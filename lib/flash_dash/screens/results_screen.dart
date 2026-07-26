@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
-import 'home_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
   final int score;
@@ -59,7 +58,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
         centerTitle: true,
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: Center(
@@ -175,13 +174,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   height: 65,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HomeScreen(),
-                        ),
-                        (route) => false,
-                      );
+                      Navigator.pop(context);
                     },
                     icon: const Icon(
                       Icons.home,
