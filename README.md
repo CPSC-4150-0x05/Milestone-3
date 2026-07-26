@@ -178,7 +178,7 @@ lib/
 ## Team Members
 
 - Anthony Frialde
-- Price
+- Medelin Price
 - Team 0x05
 
 ---
